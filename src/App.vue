@@ -1,30 +1,38 @@
 <template>
-  <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
-  </nav>
-  <router-view/>
+
+  <template v-if="user">
+    <router-view />
+  </template>
+  <Auth v-if="!user && user !== undefined"/>
 </template>
 
-<style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
+<script>
+import { onMounted } from "@vue/runtime-core";
+import { auth } from "./utils/firebase";
+import { useStore } from "vuex";
+import { computed } from "vue";
+import Auth from "./views/Auth.vue";
 
-nav {
-  padding: 30px;
+export default {
+  name: "App",
+  setup() {
+    const store = useStore();
+    const user = computed(() => store.state.user);
 
-  a {
-    font-weight: bold;
-    color: #2c3e50;
+    onMounted(() => {
+      auth.onAuthStateChanged((user) => {
+        store.commit("setUser", user);
+      });
+    });
+    return {
+      user,
+    };
 
-    &.router-link-exact-active {
-      color: #42b983;
-    }
+  },
+  components:{
+    Auth
   }
-}
-</style>
+};
+</script>
+
+<style lang="scss"></style>
