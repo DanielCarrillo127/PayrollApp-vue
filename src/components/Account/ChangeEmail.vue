@@ -29,6 +29,8 @@
 import { ref } from "vue";
 import * as Yup from "yup";
 import { auth, updateEmailFuntion } from "../../utils/firebase";
+import { reauthenticate } from "../../utils/firebaseFunctions";
+
 
 export default {
   name: "ChangeEmail",
@@ -53,8 +55,8 @@ export default {
 
         try {
           const { email, password } = formData;
-          
-          await updateEmailFuntion(email);
+          await reauthenticate(password);
+        //   await updateEmailFuntion(email);
         } catch (error) {
           console.log(error);
           messageError.value = error.message;
