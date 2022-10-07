@@ -27,10 +27,11 @@
 
 <script>
 import { ref } from "vue";
+import  {useStore} from "vuex";
 import * as Yup from "yup";
+
 import { auth, updateEmailFuntion } from "../../utils/firebase";
 import { reauthenticate } from "../../utils/firebaseFunctions";
-
 
 export default {
   name: "ChangeEmail",
@@ -39,6 +40,7 @@ export default {
     let formError = ref({});
     let messageError = ref("");
     let loading = ref(false);
+    const store = useStore();
 
     const schemeForm = Yup.object().shape({
       email: Yup.string().email(true).required(true),
@@ -56,7 +58,8 @@ export default {
         try {
           const { email, password } = formData;
           await reauthenticate(password);
-        //   await updateEmailFuntion(email);
+          await updateEmailFuntion(email);
+          store.dispatch("reloadUser");
         } catch (error) {
           console.log(error);
           messageError.value = error.message;

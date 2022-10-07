@@ -37,7 +37,7 @@ export default {
        
        try {
           await updateName(name.value);
-          await store.dispatch("reloadUser");
+          store.dispatch("reloadUser");
         } catch (error) {
           console.log(error);
         }
