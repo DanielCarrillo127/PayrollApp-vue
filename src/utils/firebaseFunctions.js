@@ -1,5 +1,5 @@
 import firebase from "firebase/app";
-import { auth } from "./firebase";
+// import { auth } from "./firebase";
 import {  EmailAuthProvider } from "firebase/auth";
 
 
@@ -11,7 +11,9 @@ export function reauthenticate(password) {
         password
     )
     return user.reauthenticateWithCredential(credentials);
+
 }
+
 
 
 // const credential = EmailAuthProvider.
