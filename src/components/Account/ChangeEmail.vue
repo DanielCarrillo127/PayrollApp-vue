@@ -60,6 +60,7 @@ export default {
           await reauthenticate(password);
           await updateEmailFuntion(email);
           store.dispatch("reloadUser");
+          window.location.reload();
         } catch (error) {
           console.log(error);
           messageError.value = error.message;

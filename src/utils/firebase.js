@@ -8,6 +8,8 @@ import {
   updatePassword,
 } from "firebase/auth";
 
+import { getStorage,ref, uploadBytes } from "firebase/storage";
+
 const firebaseConfig = {
   apiKey: "AIzaSyAMKYbAkKhgp4aFifI4dczyjyD4yt2cqCE",
   authDomain: "payroll-app-vue.firebaseapp.com",
@@ -21,6 +23,9 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 const auth = getAuth(app);
+const storage = getStorage(app);
+
+
 
 const register = (email, password) => {
   createUserWithEmailAndPassword(auth, email, password)
@@ -77,6 +82,16 @@ const updatePasswordFuntion = (newPassword) => {
     });
 };
 
+const uploadFileStorage = (file,id) => {
+  const user = auth.currentUser;
+  const storageRef = ref(storage, user.uid);
+  uploadBytes(storageRef, file, id).then((snapshot) => {
+    console.log('Uploaded a blob or file!');
+  });
+};
+
+
+
 export {
   auth,
   register,
@@ -84,4 +99,5 @@ export {
   updateName,
   updateEmailFuntion,
   updatePasswordFuntion,
+  uploadFileStorage
 };
