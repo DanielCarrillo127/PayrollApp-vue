@@ -8,9 +8,22 @@ import {
   updatePassword,
 } from "firebase/auth";
 
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import {
+  getStorage,
+  ref,
+  uploadBytes,
+  getDownloadURL,
+  deleteObject,
+} from "firebase/storage";
 
-import { getFirestore, collection, addDoc } from "firebase/firestore";
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  getDocs,
+  deleteDoc,
+  doc,
+} from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAMKYbAkKhgp4aFifI4dczyjyD4yt2cqCE",
@@ -85,18 +98,16 @@ const updatePasswordFuntion = (newPassword) => {
 
 const uploadFileStorage = async (file, id, date) => {
   const user = auth.currentUser;
-  let payrollUrl = ""
+  let payrollUrl = "";
   const storageRef = ref(storage, `${user.uid}/${id}`);
   await uploadBytes(storageRef, file).then((snapshot) => {
     console.log("Uploaded a blob or file!");
-    console.log(snapshot);
   });
 
   await getDownloadURL(ref(storage, `${user.uid}/${id}`))
     .then((url) => {
       // `url` is the download URL for 'images/stars.jpg'
       payrollUrl = url;
-      console.log(payrollUrl);
     })
     .catch((error) => {
       // Handle any errors
@@ -115,6 +126,38 @@ const uploadFileStorage = async (file, id, date) => {
   }
 };
 
+const getPayrollsFuntion = async () => {
+  const result = [];
+  const user = auth.currentUser;
+  const querySnapshot = await getDocs(collection(db, `${user.uid}`));
+  querySnapshot.forEach((doc) => {
+    const data = doc.data();
+    data.id = doc.id;
+    result.push(data);
+  });
+  return result;
+};
+
+const deletePayrollFuntion = async (id,urlFile) => {
+  const user = auth.currentUser;
+  try {
+    await deleteDoc(doc(db, `${user.uid}`, id));
+  } catch (error) {
+    console.log(error);
+  }
+  //delete file from storage 
+  const desertRef = ref(storage, `${urlFile}`);
+
+  await deleteObject(desertRef)
+    .then(() => {
+      // File deleted successfully
+      console.log("File deleted successfully")
+    })
+    .catch((error) => {
+      // Uh-oh, an error occurred!
+    });
+};
+
 export {
   auth,
   register,
@@ -123,4 +166,6 @@ export {
   updateEmailFuntion,
   updatePasswordFuntion,
   uploadFileStorage,
+  getPayrollsFuntion,
+  deletePayrollFuntion,
 };

@@ -2,9 +2,8 @@
   <BasicLayout>
     <div class="payrolls">
       <h1>Mis nominas</h1>
-      <UploadPayroll/>
-      <PayrollList/>
-
+      <UploadPayroll :getPayrolls="getPayrolls"/>
+      <PayrollList :payrolls="payrolls" :getPayrolls="getPayrolls" />
     </div>
   </BasicLayout>
 </template>
@@ -12,19 +11,29 @@
 <script>
 import BasicLayout from "../layouts/BasicLayaut.vue";
 import { ref, onMounted } from "vue";
-import UploadPayroll from "../components/Payrolls/UploadPayroll.vue"
+import UploadPayroll from "../components/Payrolls/UploadPayroll.vue";
 import PayrollList from "../components/Payrolls/PayrollList.vue";
-
+import {getPayrollsFuntion } from "../utils/firebase";
 
 export default {
   name: "Payrolls",
-  setup(){
-
+  setup() {
+    let payrolls = ref(null);
+    onMounted(() => {
+      getPayrolls();
+    });
+    const getPayrolls = async () => {
+      payrolls.value = await getPayrollsFuntion();
+    };
+    return {
+      payrolls,
+      getPayrolls,
+    };
   },
   components: {
     BasicLayout,
     UploadPayroll,
-    PayrollList
+    PayrollList,
   },
 };
 </script>
