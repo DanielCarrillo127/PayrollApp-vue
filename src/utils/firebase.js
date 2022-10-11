@@ -8,7 +8,9 @@ import {
   updatePassword,
 } from "firebase/auth";
 
-import { getStorage,ref, uploadBytes } from "firebase/storage";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+
+import { getFirestore, collection, addDoc } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAMKYbAkKhgp4aFifI4dczyjyD4yt2cqCE",
@@ -24,8 +26,7 @@ const app = initializeApp(firebaseConfig);
 
 const auth = getAuth(app);
 const storage = getStorage(app);
-
-
+const db = getFirestore(app);
 
 const register = (email, password) => {
   createUserWithEmailAndPassword(auth, email, password)
@@ -82,15 +83,37 @@ const updatePasswordFuntion = (newPassword) => {
     });
 };
 
-const uploadFileStorage = (file,id) => {
+const uploadFileStorage = async (file, id, date) => {
   const user = auth.currentUser;
-  const storageRef = ref(storage, user.uid);
-  uploadBytes(storageRef, file, id).then((snapshot) => {
-    console.log('Uploaded a blob or file!');
+  let payrollUrl = ""
+  const storageRef = ref(storage, `${user.uid}/${id}`);
+  await uploadBytes(storageRef, file).then((snapshot) => {
+    console.log("Uploaded a blob or file!");
+    console.log(snapshot);
   });
+
+  await getDownloadURL(ref(storage, `${user.uid}/${id}`))
+    .then((url) => {
+      // `url` is the download URL for 'images/stars.jpg'
+      payrollUrl = url;
+      console.log(payrollUrl);
+    })
+    .catch((error) => {
+      // Handle any errors
+      console.log(error);
+    });
+
+  try {
+    const docRef = await addDoc(collection(db, `${user.uid}`), {
+      payrollUrl,
+      date: new Date(date),
+      dateString: date,
+    });
+    console.log("Document written with ID: ", docRef.id);
+  } catch (e) {
+    console.error("Error adding document: ", e);
+  }
 };
-
-
 
 export {
   auth,
@@ -99,5 +122,5 @@ export {
   updateName,
   updateEmailFuntion,
   updatePasswordFuntion,
-  uploadFileStorage
+  uploadFileStorage,
 };

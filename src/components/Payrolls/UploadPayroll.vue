@@ -42,7 +42,7 @@
 <script>
 import { ref } from "vue";
 import { v4 as uuidv4 } from "uuid";
-import {uploadFileStorage} from "../../utils/firebase";
+import { uploadFileStorage } from "../../utils/firebase";
 
 export default {
   name: "UploadPayroll",
@@ -76,15 +76,17 @@ export default {
         loading.value = true;
 
         try {
-            const fileId = uuidv4();
-            await uploadFileStorage(file,fileId);
-            
+          const fileId = uuidv4();
+          await uploadFileStorage(file.value, fileId,date.value);
         } catch (error) {
-            console.log(error);
+          console.log(error);
         }
-
-
-
+        loading.value = false;
+        file.value = null;
+        date.value = null;
+        showForm.value = false;
+        error.value = null;
+        document.getElementById("file").value = "";
       } else {
         error.value = "Sube una nomina y selecciona la fecha de la nomina";
       }
